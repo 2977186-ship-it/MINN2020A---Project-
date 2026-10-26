@@ -112,68 +112,51 @@ elif menu_choice == "Worker Safety Data":
         st.table(high_risk[["WorkerID", "Name", "PPE_Compliance_pct", "FatigueLevel_1to10"]])
 
 # --- INCIDENTS ---
-# This goes inside your "if page == 'Safety Incidents':" block
-
-st.title("⚠️ Safety Incidents Database")
-
-# 1. Metrics Row (Fulfills the "Count Incidents" requirement)
-col1, col2, col3 = st.columns(3)
-col1.metric("Total Incidents", len(incidents_df))
-# Assuming you have a 'SeverityClass' column:
-critical_count = len(incidents_df[incidents_df['SeverityClass'] == 'Critical'])
-col2.metric("Critical Incidents", critical_count)
-# Assuming you have a 'LostTimeInjury' column:
-lti_count = len(incidents_df[incidents_df['LostTimeInjury'] == 'Yes'])
-col3.metric("Lost-Time Injuries", lti_count)
-
-st.divider()
-
-# 2. Add Incident Form (The missing feature)
-with st.expander("➕ Add a New Incident", expanded=False):
-    with st.form("new_incident_form"):
-        st.write("Enter the details of the new incident below:")
+with st.expander("📝 Add New Incident"):
+    with st.form("add_incident_form"):
+        date = st.date_input("Date")
+        time = st.time_input("Time")
+        shift = st.selectbox("Shift", ["Day", "Night"])
+        location = st.text_input("Location")
+        department = st.text_input("Department")
+        incident_type = st.text_input("Incident Type")
+        severity = st.selectbox("Severity", ["Minor", "Moderate", "LTI"])
+        severity_class = st.selectbox("Severity Class", ["Low", "High", "Critical"])
+        status = st.selectbox("Status", ["Open", "Under Investigation", "Closed"])
         
-        c1, c2 = st.columns(2)
-        with c1:
-            date = st.date_input("Date")
-            shift = st.selectbox("Shift", ["Day", "Night"])
-            location = st.text_input("Location")
-        with c2:
-            incident_type = st.text_input("Incident Type")
-            severity_class = st.selectbox("Severity Class", ["Low", "Medium", "High", "Critical"])
-            status = st.selectbox("Status", ["Open", "Under Investigation", "Closed"])
-            
-        # Submit Button
-        submit = st.form_submit_button("Submit Incident")
+        # Submit button
+        submitted = st.form_submit_button("Save Incident")
         
-        if submit:
-            if not location or not incident_type:
-                st.error("Location and Incident Type are required!")
+        if submitted:
+            # Basic validation
+            if not location or not department or not incident_type:
+                st.error("Please fill in all required text fields.")
             else:
-                # Create a new row (You will need to adapt this to match your exact CSV columns)
-                new_id = f"INC{len(incidents_df) + 1:04d}"
-                
-                new_data = {
-                    "IncidentID": new_id,
+                # Create new incident dictionary
+                new_incident = {
+                    "IncidentID": f"INC{incident_id_counter:04d}",
                     "Date": str(date),
+                    "Time": str(time),
                     "Shift": shift,
                     "Location": location,
+                    "Department": department,
                     "IncidentType": incident_type,
+                    "Severity": severity,
                     "SeverityClass": severity_class,
                     "IncidentStatus": status
                 }
                 
-                # Add to dataframe
-                new_row = pd.DataFrame([new_data])
-                incidents_df = pd.concat([incidents_df, new_row], ignore_index=True)
+                # Add to dataframe (and ideally save to CSV)
+                new_row = pd.DataFrame([new_incident])
+                st.session_state['incidents_df'] = pd.concat([st.session_state['incidents_df'], new_row], ignore_index=True)
                 
-                # Save back to CSV (Crucial for persistence)
-                incidents_df.to_csv("incidents.csv", index=False)
-                
-                st.success(f"Incident {new_id} added successfully! Please refresh or clear cache if needed.")
-                st.rerun() # Refreshes the page to show the new table
+                st.success(f"Incident {new_incident['IncidentID']} added successfully!")
+                st.rerun() # Refresh the page to show the new data
 
-st.divider()
+# --- DISPLAY TABLE SECTION ---
+# Your existing filter code goes here...
+st.write("### Current Incidents")
+# st.dataframe(filtered_df) ...
 
 # 3. Filters
 st.write("### Filter Incidents")
