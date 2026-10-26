@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -177,12 +178,14 @@ if severity_filter != "All":
 st.write("### Incident Records")
 st.dataframe(filtered_df, use_container_width=True)
 # --- EQUIPMENT ---
-menu_choice == "Equipment Data"
-st.title("🚜 Equipment Condition Monitoring")
-df_eq = pd.DataFrame(equipment)
-st.dataframe(df_eq[["EquipmentID", "EquipmentType", "Temperature_C", "Vibration_mms", "Availability_pct", "MaintenanceStatus"]], use_container_width=True)
-st.subheader("Live Condition Status")
-for e in equipment:
+menu_choice == "Equipment Data":
+    st.title("🚜 Equipment Condition Monitoring")
+    df_eq = pd.DataFrame(equipment)
+    
+    st.dataframe(df_eq[["EquipmentID", "EquipmentType", "Temperature_C", "Vibration_mms", "Availability_pct", "MaintenanceStatus"]], use_container_width=True)
+    
+    st.subheader("Live Condition Status")
+    for e in equipment:
         t_stat = temp_status(e["Temperature_C"])
         v_stat = vib_status(e["Vibration_mms"])
         
@@ -202,4 +205,3 @@ elif menu_choice == "Maintenance Data":
             st.warning(f"**{row['EquipmentID']}** ({row['EquipmentType']}): {', '.join(flags)}")
         else:
             st.success(f"**{row['EquipmentID']}** ({row['EquipmentType']}): OK")
-        
