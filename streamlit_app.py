@@ -177,7 +177,7 @@ if severity_filter != "All":
 st.write("### Incident Records")
 st.dataframe(filtered_df, use_container_width=True)
 # --- EQUIPMENT ---
-menu_choice == "Equipment Data":
+menu_choice == "Equipment Data"
     st.title("🚜 Equipment Condition Monitoring")
     df_eq = pd.DataFrame(equipment)
     
