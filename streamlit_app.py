@@ -178,13 +178,11 @@ st.write("### Incident Records")
 st.dataframe(filtered_df, use_container_width=True)
 # --- EQUIPMENT ---
 menu_choice == "Equipment Data"
-    st.title("🚜 Equipment Condition Monitoring")
-    df_eq = pd.DataFrame(equipment)
-    
-    st.dataframe(df_eq[["EquipmentID", "EquipmentType", "Temperature_C", "Vibration_mms", "Availability_pct", "MaintenanceStatus"]], use_container_width=True)
-    
-    st.subheader("Live Condition Status")
-    for e in equipment:
+st.title("🚜 Equipment Condition Monitoring")
+df_eq = pd.DataFrame(equipment)
+st.dataframe(df_eq[["EquipmentID", "EquipmentType", "Temperature_C", "Vibration_mms", "Availability_pct", "MaintenanceStatus"]], use_container_width=True)
+st.subheader("Live Condition Status")
+for e in equipment:
         t_stat = temp_status(e["Temperature_C"])
         v_stat = vib_status(e["Vibration_mms"])
         
