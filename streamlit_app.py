@@ -6,10 +6,7 @@ from datetime import datetime
 # 1. PAGE CONFIG & SETUP
 # ==========================================
 st.set_page_config(page_title="Khwezi Mining Monitor", page_icon="⛏️", layout="wide")
-st.image(
-    "underground-mining-equipment.jpg",
-    use_column_width=True
-)
+
 st.markdown(
     "<h2 style='text-align: center; color: #D4AF37; font-style: italic;'>"
     '"If it can\'t be grown, it must be mined."'
