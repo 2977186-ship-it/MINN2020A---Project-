@@ -125,7 +125,7 @@ menu_choice = st.sidebar.radio("Navigate to:", menu_options)
 
 # --- DASHBOARD ---
 if menu_choice == "View Dashboard":
-    st.markdown("<h1 style='text-align: center;'>📊 Monitoring Dashboard</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'> Monitoring Dashboard</h1>", unsafe_allow_html=True)
     st.markdown(f"<p style='text-align: center;'>Logged in as: <b>{position}</b></p>", unsafe_allow_html=True)
     st.divider()
     
@@ -167,20 +167,20 @@ if menu_choice == "View Dashboard":
         ''', unsafe_allow_html=True)
     
     st.divider()
-    st.subheader("🚨 Quick Alert Summary")
+    st.subheader(" Quick Alert Summary")
     critical_equip = [e["EquipmentID"] for e in equipment if temp_status(e["Temperature_C"]) == "CRITICAL" or vib_status(e["Vibration_mms"]) == "CRITICAL"]
     if critical_equip:
         st.error(f"*CRITICAL ALERT:* Equipment temperature/vibration out of bounds detected on: {', '.join(critical_equip)}. Inspect immediately.")
     else:
-        st.success("✅ All equipment within normal operating limits.")
+        st.success("All equipment within normal operating limits.")
 
 # --- WORKER SAFETY ---
 elif menu_choice == "Worker Safety Data":
-    st.title("👷 Worker Safety Data")
+    st.title(" Worker Safety Data")
     df_workers = pd.DataFrame(workers)
     st.dataframe(df_workers[["WorkerID", "Name", "JobRole", "PPE_Compliance_pct", "FatigueLevel_1to10", "RiskLevel"]], use_container_width=True)
     
-    st.subheader("⚠️ High Risk Workers (Require Immediate Action)")
+    st.subheader(" High Risk Workers (Require Immediate Action)")
     high_risk = df_workers[df_workers["RiskLevel"] == "High"]
     if not high_risk.empty:
         st.warning(f"Found {len(high_risk)} high-risk workers. Check their PPE and Fatigue levels.")
@@ -188,7 +188,7 @@ elif menu_choice == "Worker Safety Data":
 
 # --- INCIDENTS ---
 elif menu_choice == "Safety Incidents":
-    st.title("⚠️ Safety Incidents Database")
+    st.title("Safety Incidents Database")
     
     # KPI Counts for Incidents (Requirement)
     c1, c2, c3 = st.columns(3)
@@ -202,7 +202,7 @@ elif menu_choice == "Safety Incidents":
     st.divider()
 
     # ADD INCIDENT FORM (Now properly placed inside this page)
-    with st.expander("📝 Add New Incident", expanded=False):
+    with st.expander("Add New Incident", expanded=False):
         with st.form("add_incident_form"):
             col1, col2 = st.columns(2)
             with col1:
@@ -267,7 +267,7 @@ elif menu_choice == "Safety Incidents":
 
 # --- EQUIPMENT ---
 elif menu_choice == "Equipment Data":
-    st.title("🚜 Equipment Condition Monitoring")
+    st.title(" Equipment Condition Monitoring")
     df_eq = pd.DataFrame(equipment)
     
     st.dataframe(df_eq[["EquipmentID", "EquipmentType", "Temperature_C", "Vibration_mms", "Availability_pct", "MaintenanceStatus"]], use_container_width=True)
@@ -278,9 +278,9 @@ elif menu_choice == "Equipment Data":
         v_stat = vib_status(e["Vibration_mms"])
         
         if t_stat == "CRITICAL" or v_stat == "CRITICAL":
-            st.error(f"🔴 *{e['EquipmentID']}* - Temp: {e['Temperature_C']}°C ({t_stat}) | Vib: {e['Vibration_mms']}mm/s ({v_stat}) - *INSPECT IMMEDIATELY*")
+            st.error(f" *{e['EquipmentID']}* - Temp: {e['Temperature_C']}°C ({t_stat}) | Vib: {e['Vibration_mms']}mm/s ({v_stat}) - *INSPECT IMMEDIATELY*")
         elif t_stat == "WARNING" or v_stat == "WARNING":
-            st.warning(f"🟡 *{e['EquipmentID']}* - Temp: {e['Temperature_C']}°C ({t_stat}) | Vib: {e['Vibration_mms']}mm/s ({v_stat})")
+            st.warning(f" *{e['EquipmentID']}* - Temp: {e['Temperature_C']}°C ({t_stat}) | Vib: {e['Vibration_mms']}mm/s ({v_stat})")
 
 # --- MAINTENANCE ---
 elif menu_choice == "Maintenance Data":
