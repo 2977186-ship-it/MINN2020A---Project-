@@ -112,19 +112,87 @@ elif menu_choice == "Worker Safety Data":
         st.table(high_risk[["WorkerID", "Name", "PPE_Compliance_pct", "FatigueLevel_1to10"]])
 
 # --- INCIDENTS ---
-elif menu_choice == "Safety Incidents":
-    st.title("⚠️ Safety Incidents Database")
-    
-    col1, col2 = st.columns(2)
-    shift_filter = col1.selectbox("Filter by Shift", ["All", "Day", "Night"])
-    sev_filter = col2.selectbox("Filter by Severity Class", ["All", "Low", "High", "Critical"])
-    
-    df_inc = pd.DataFrame(incidents)
-    if shift_filter != "All": df_inc = df_inc[df_inc["Shift"] == shift_filter]
-    if sev_filter != "All": df_inc = df_inc[df_inc["SeverityClass"] == sev_filter]
-    
-    st.dataframe(df_inc[["IncidentID", "Date", "Shift", "IncidentType", "SeverityClass", "IncidentStatus"]], use_container_width=True)
+# This goes inside your "if page == 'Safety Incidents':" block
 
+st.title("⚠️ Safety Incidents Database")
+
+# 1. Metrics Row (Fulfills the "Count Incidents" requirement)
+col1, col2, col3 = st.columns(3)
+col1.metric("Total Incidents", len(incidents_df))
+# Assuming you have a 'SeverityClass' column:
+critical_count = len(incidents_df[incidents_df['SeverityClass'] == 'Critical'])
+col2.metric("Critical Incidents", critical_count)
+# Assuming you have a 'LostTimeInjury' column:
+lti_count = len(incidents_df[incidents_df['LostTimeInjury'] == 'Yes'])
+col3.metric("Lost-Time Injuries", lti_count)
+
+st.divider()
+
+# 2. Add Incident Form (The missing feature)
+with st.expander("➕ Add a New Incident", expanded=False):
+    with st.form("new_incident_form"):
+        st.write("Enter the details of the new incident below:")
+        
+        c1, c2 = st.columns(2)
+        with c1:
+            date = st.date_input("Date")
+            shift = st.selectbox("Shift", ["Day", "Night"])
+            location = st.text_input("Location")
+        with c2:
+            incident_type = st.text_input("Incident Type")
+            severity_class = st.selectbox("Severity Class", ["Low", "Medium", "High", "Critical"])
+            status = st.selectbox("Status", ["Open", "Under Investigation", "Closed"])
+            
+        # Submit Button
+        submit = st.form_submit_button("Submit Incident")
+        
+        if submit:
+            if not location or not incident_type:
+                st.error("Location and Incident Type are required!")
+            else:
+                # Create a new row (You will need to adapt this to match your exact CSV columns)
+                new_id = f"INC{len(incidents_df) + 1:04d}"
+                
+                new_data = {
+                    "IncidentID": new_id,
+                    "Date": str(date),
+                    "Shift": shift,
+                    "Location": location,
+                    "IncidentType": incident_type,
+                    "SeverityClass": severity_class,
+                    "IncidentStatus": status
+                }
+                
+                # Add to dataframe
+                new_row = pd.DataFrame([new_data])
+                incidents_df = pd.concat([incidents_df, new_row], ignore_index=True)
+                
+                # Save back to CSV (Crucial for persistence)
+                incidents_df.to_csv("incidents.csv", index=False)
+                
+                st.success(f"Incident {new_id} added successfully! Please refresh or clear cache if needed.")
+                st.rerun() # Refreshes the page to show the new table
+
+st.divider()
+
+# 3. Filters
+st.write("### Filter Incidents")
+f1, f2 = st.columns(2)
+with f1:
+    shift_filter = st.selectbox("Filter by Shift", ["All"] + list(incidents_df['Shift'].unique()))
+with f2:
+    severity_filter = st.selectbox("Filter by Severity Class", ["All"] + list(incidents_df['SeverityClass'].unique()))
+
+# Apply filters
+filtered_df = incidents_df.copy()
+if shift_filter != "All":
+    filtered_df = filtered_df[filtered_df['Shift'] == shift_filter]
+if severity_filter != "All":
+    filtered_df = filtered_df[filtered_df['SeverityClass'] == severity_filter]
+
+# 4. Display Table
+st.write("### Incident Records")
+st.dataframe(filtered_df, use_container_width=True)
 # --- EQUIPMENT ---
 elif menu_choice == "Equipment Data":
     st.title("🚜 Equipment Condition Monitoring")
